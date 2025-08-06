@@ -99,21 +99,11 @@ class TypingTestSystem {
     checkIPAuthorization() {
         const authorizedIP = this.authorizedIPs.find(ip => ip.address === this.currentIP && ip.active);
         if (authorizedIP) {
-            // 檢查IP是否被停權
-            if (!authorizedIP.active) {
-                this.showBannedMessage();
-                return;
-            }
             this.isAuthenticated = true;
             this.showWelcomeScreen();
-        } else {
+        } else if (this.authorizedIPs.find(ip => ip.address === this.currentIP && !ip.active)) {
             // 檢查是否有被停權的IP記錄
-            const bannedIP = this.authorizedIPs.find(ip => ip.address === this.currentIP && !ip.active);
-            if (bannedIP) {
-                this.showBannedMessage();
-                return;
-            }
-            this.showAuthScreen();
+            this.showBannedMessage();
         } else {
             this.showAuthScreen();
         }
