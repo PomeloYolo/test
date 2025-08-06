@@ -99,8 +99,21 @@ class TypingTestSystem {
     checkIPAuthorization() {
         const authorizedIP = this.authorizedIPs.find(ip => ip.address === this.currentIP && ip.active);
         if (authorizedIP) {
+            // 檢查IP是否被停權
+            if (!authorizedIP.active) {
+                this.showBannedMessage();
+                return;
+            }
             this.isAuthenticated = true;
             this.showWelcomeScreen();
+        } else {
+            // 檢查是否有被停權的IP記錄
+            const bannedIP = this.authorizedIPs.find(ip => ip.address === this.currentIP && !ip.active);
+            if (bannedIP) {
+                this.showBannedMessage();
+                return;
+            }
+            this.showAuthScreen();
         } else {
             this.showAuthScreen();
         }
@@ -135,6 +148,9 @@ class TypingTestSystem {
         // 操作說明按鈕
         document.getElementById('instructionsBtn').addEventListener('click', () => this.showInstructions());
         document.getElementById('backToHomeFromInstructions').addEventListener('click', () => this.goHome());
+        
+        // 在歡迎頁面也監聽鍵盤事件
+        document.addEventListener('keypress', (e) => this.handleGlobalKeyPress(e));
 
         // 結果按鈕
         document.getElementById('restartBtn').addEventListener('click', () => this.restart());
@@ -144,6 +160,22 @@ class TypingTestSystem {
         // 打稿檢視按鈕
         document.getElementById('backToResultBtn').addEventListener('click', () => this.backToResult());
         document.getElementById('backToHomeBtn').addEventListener('click', () => this.goHome());
+    }
+
+    handleGlobalKeyPress(event) {
+        // 只在歡迎頁面監聽管理員序列
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        if (welcomeScreen.style.display === 'block') {
+            this.adminSequence += event.key;
+            if (this.adminSequence.length > 4) {
+                this.adminSequence = this.adminSequence.slice(-4);
+            }
+            
+            if (this.adminSequence === '1229') {
+                this.showAdminScreen();
+                this.adminSequence = '';
+            }
+        }
     }
 
     handleAdminSequence(key) {
@@ -416,6 +448,18 @@ class TypingTestSystem {
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('welcomeScreen').style.display = 'block';
         document.getElementById('adminScreen').style.display = 'none';
+    }
+
+    showBannedMessage() {
+        // 顯示停權提示訊息
+        const message = "對不起，您的授權碼已被停權，請重新輸入授權碼以繼續使用";
+        alert(message);
+        
+        // 清除認證狀態
+        this.isAuthenticated = false;
+        
+        // 跳轉到登入介面
+        this.showAuthScreen();
     }
 
     showInstructions() {
