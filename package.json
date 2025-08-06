@@ -1,0 +1,16 @@
+{
+  "name": "typing-test-system",
+  "version": "1.0.0",
+  "description": "線上英打測驗系統",
+  "main": "index.html",
+  "scripts": {
+    "dev": "live-server --port=3000 --open=/index.html",
+    "start": "live-server --port=3000 --open=/index.html"
+  },
+  "keywords": ["typing", "test", "english", "practice"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
